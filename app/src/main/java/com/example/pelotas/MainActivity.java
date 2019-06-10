@@ -35,6 +35,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     List<Ball> balls;
 
+    ImageView square;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         ballToInsert2.id = 2;
 
         balls.add(ballToInsert2);
+
+        square = findViewById(R.id.imageView2);
 
 // Obtenim les dimensions de la pantalla
         DisplayMetrics display = this.getBaseContext().getResources().getDisplayMetrics();
@@ -134,7 +138,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             }
 // Si en surt, establim la posició màxima en horitzontal perquè es pugui veure la imatge.
-            else ball.xSpeed = ball.xSpeed * -1;
+            else ball.ball.setX(0);
+//            else ball.xSpeed = ball.xSpeed * -1;
         }
 
 // Fem el mateix pel moviment cap a l'esquerra
@@ -142,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             if (novaPosicioX >= 0) {
                 ball.ball.setX(novaPosicioX);
 
-            } else ball.xSpeed = ball.xSpeed * -1;
+            } else ball.ball.setX(width - ball.ball.getWidth());
 
         }
 
@@ -162,6 +167,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             } else ball.ySpeed = ball.ySpeed * -1;
 
         }
+
+
+        //square
+        bounceSquare(ball);
+
 
         //chocar con otras bolas
         for (int i = 0; i < balls.subList(index, balls.size()).size(); i++) {
@@ -188,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     int verticalDistance = ya1 - yb1;
                     verticalDistance = verticalDistance < 0 ? verticalDistance * -1 : verticalDistance;
 
-                    int acceptableToLateralCollision = (int)(ball.ball.getWidth()*(80/100.0f));
+                    int acceptableToLateralCollision = (int)(ball.ball.getWidth()*(90/100.0f));
 
 
 
@@ -243,6 +253,37 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         }
         return super.onTouchEvent(event);
+    }
+
+    public void bounceSquare(Ball ball) {
+        int xa1 = (int) ball.ball.getX();
+        int xa2 = (int) ball.ball.getX() + ball.ball.getWidth();
+
+        int xb1 = (int) square.getX();
+        int xb2 = (int) square.getX() + square.getWidth();
+
+        int ya1 = (int) ball.ball.getY();
+        int ya2 = (int) ball.ball.getY() + ball.ball.getHeight();
+
+        int yb1 = (int) square.getY();
+        int yb2 = (int) square.getY() + square.getHeight();
+
+        if(((xb1 - xa2) * (xb2 - xa1) <= 0) && ((yb1 - ya2)*(yb2- ya1) <= 0)) {
+
+            int verticalDistance = ya1 - yb1;
+            verticalDistance = verticalDistance < 0 ? verticalDistance * -1 : verticalDistance;
+
+            int acceptableToLateralCollision = (int)(square.getWidth()*(95/100.0f));
+
+
+
+            if(((xa1 >= xb1 && xa1 <= xb2) || (xb1 >= xa1 && xb1 <= xa2)) && verticalDistance >= acceptableToLateralCollision) {
+                ball.ySpeed = ball.ySpeed * -1;
+            }else{
+                ball.xSpeed = ball.xSpeed * -1;
+            }
+
+        }
     }
 
 }
